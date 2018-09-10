@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -89,7 +89,7 @@ namespace CheatingHangman.src
                     usedLetters.Sort();
 
                     families            = wordBank.CreateWordFamilies(guess);
-                    familySelection     = wordBank.PickAFamily(families);
+                    familySelection     = WordBank.PickAFamily(families);
 
                     //Family Selection Handling
                     if (familySelection == 0)
@@ -100,8 +100,8 @@ namespace CheatingHangman.src
                     else if (familySelection == 1)
                     {
                         Console.WriteLine(1);
-                        families = wordBank.SingleCharWord(families[familySelection], guess);
-                        familySelection = wordBank.PickAFamily(families);
+                        families = WordBank.SingleCharWord(families[familySelection], guess);
+                        familySelection = WordBank.PickAFamily(families);
                         wordBank.Words = families[familySelection];
                         correctGuesses[familySelection] = guess;
                     }

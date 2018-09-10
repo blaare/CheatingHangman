@@ -107,7 +107,7 @@ namespace CheatingHangman.src
          * Goal:    to pick the largest family every time
          * 
          */ 
-        public int PickAFamily(Dictionary<int, List<string>> families)
+        public static int PickAFamily(Dictionary<int, List<string>> families)
         {
             int biggestFamily = 0;
             for(int i = 0; i < families.Count; i++)
@@ -130,7 +130,7 @@ namespace CheatingHangman.src
             return s.Count(f => f == c);
         }
 
-        public Dictionary<int, List<string>> SingleCharWord(List<string> family, char c)
+        public static Dictionary<int, List<string>> SingleCharWord(List<string> family, char c)
         {
             int wordLength = family.First().Length;
             Dictionary<int, List<string>> subFamilies = new Dictionary<int, List<string>>();
@@ -140,7 +140,7 @@ namespace CheatingHangman.src
             }
             foreach(string s in family)
             {
-                subFamilies[NumberOfOccurrences(s, c)].Add(s);
+                subFamilies[s.IndexOf(c)].Add(s);
             }
 
 
