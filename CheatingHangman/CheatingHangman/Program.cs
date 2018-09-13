@@ -9,7 +9,7 @@ namespace CheatingHangman.src
     class Program
     {
         const string WORD_FILE_LOCATION = @"C:\Users\Timothy Wilson\Documents\GameDevelopment\1_CheatingHangman\CheatingHangman\CheatingHangman\assets\dictionary.txt";
-        const int ALLOWED_GUESSES = 10;
+        const int ALLOWED_GUESSES       = 26;
 
         static void Main(string[] args)
         {
@@ -22,14 +22,18 @@ namespace CheatingHangman.src
             int longestWordLength   = wordBank.FindLongestWord().Length,
                 shortestWordLength  = wordBank.FindShortestWord().Length,
                 incorrectGuesses    = 0,
+                correctGuesses      = 0,
                 wordLength,
                 familySelection;
 
             List<char> usedLetters  = new List<char>();
             
             Dictionary<int, List<string>> families;
-            
-            char[] correctGuesses;
+            Dictionary<string, List<string>> complexFamily;
+
+            string complexFamilySelection;
+             
+            char[] theWord;
             char guess;
 
             //Initialization Process
@@ -68,7 +72,7 @@ namespace CheatingHangman.src
             //Prepare for Guessing
 
             wordBank.Words = wordBank.FindWordsOfLength(wordLength);
-            correctGuesses = new char[wordLength];
+            theWord = new char[wordLength];
 
             //Guessing Process
 
@@ -79,7 +83,7 @@ namespace CheatingHangman.src
                 DisplayNumberOfGuesses(ALLOWED_GUESSES - incorrectGuesses);
                 if (displayCounter)
                     DisplayCounter(wordBank);
-                DisplayWordBlanks(wordLength, correctGuesses);
+                DisplayWordBlanks(wordLength, theWord);
                 DisplayUsedLetters(usedLetters);
                 guess = char.ToLower(GetUserGuess());
 
@@ -91,26 +95,39 @@ namespace CheatingHangman.src
                     families            = wordBank.CreateWordFamilies(guess);
                     familySelection     = WordBank.PickAFamily(families);
 
-                    //Family Selection Handling
+                    Console.WriteLine("Family Select:" + familySelection);
+                    //If the character is not in the family
                     if (familySelection == 0)
                     {
-                        Console.WriteLine(0);
                         wordBank.Words = families[familySelection];
                     }
+                    //If the character is in the family
                     else if (familySelection == 1)
                     {
-                        Console.WriteLine(1);
                         families = WordBank.SingleCharWord(families[familySelection], guess);
                         familySelection = WordBank.PickAFamily(families);
                         wordBank.Words = families[familySelection];
-                        correctGuesses[familySelection] = guess;
+                        theWord[familySelection] = guess;
+                        correctGuesses++;
+                        
                     }
                     else
                     {
+                        complexFamily = WordBank.TwoPlusCharWord(families[familySelection], guess);
+                        complexFamilySelection = WordBank.PickAFamily(complexFamily);
+                        wordBank.Words = complexFamily[complexFamilySelection];
+                        for(int i = 0; i < wordLength; i++)
+                        {
+                            if(complexFamilySelection[i] == '1')
+                            {
+                                theWord[i] = guess;
+                                correctGuesses++;
+                            }
+                        }
 
-
-                        completedGame = (wordLength != correctGuesses.Length) || (++incorrectGuesses == ALLOWED_GUESSES);
                     }
+
+                    completedGame = (wordLength == correctGuesses) || (++incorrectGuesses == ALLOWED_GUESSES);
                 }
                 
 
@@ -124,6 +141,15 @@ namespace CheatingHangman.src
             ExitProtocol();
 
 
+        }
+
+        /**
+         * Function InputValidation
+         * Goal:    to validate the users input
+         */ 
+        public static bool InputValidation(char c)
+        {
+            return char.IsLetter(c);
         }
 
         /**
@@ -209,9 +235,14 @@ namespace CheatingHangman.src
          */
         public static char GetUserGuess()
         {
-            Console.Write("Enter Guess:");
-            char.TryParse(Console.ReadLine(), out char result);
-            return result;
+            char guess;
+            do
+            {
+                Console.Write("Enter Guess:");
+                char.TryParse(Console.ReadLine(), out char result);
+                guess = result;
+            } while (!InputValidation(guess));
+            return guess;
         }
 
 

@@ -91,7 +91,7 @@ namespace CheatingHangman.src
             Dictionary<int, List<string>> subFamilies  = new Dictionary<int, List<string>>();
             int wordLength = Words.First().Length;
 
-            for (int i = 0; i < Math.Min(wordLength, 8); i++)
+            for (int i = 0; i < wordLength+1; i++)
             { 
                 subFamilies.Add(i, new List<string>());     
             }
@@ -120,6 +120,19 @@ namespace CheatingHangman.src
             return biggestFamily;
         }
 
+        public static string PickAFamily(Dictionary<string, List<string>> families)
+        {
+            string biggestFamily = families.Keys.First();
+            foreach(KeyValuePair<string, List<string>> entry in families)
+            {
+                if(families[biggestFamily].Count < families[entry.Key].Count)
+                {
+                    biggestFamily = entry.Key;
+                }
+            }
+            return biggestFamily;
+        }
+
         /**
          * Function NumberOfOccurrences
          * Goal:    to find the number of occurrences of char c in string s
@@ -130,6 +143,10 @@ namespace CheatingHangman.src
             return s.Count(f => f == c);
         }
 
+        /**
+         * Function SingleCharWord
+         * Goal:    to find the most common location of a letter in a word.
+         */ 
         public static Dictionary<int, List<string>> SingleCharWord(List<string> family, char c)
         {
             int wordLength = family.First().Length;
@@ -143,8 +160,35 @@ namespace CheatingHangman.src
                 subFamilies[s.IndexOf(c)].Add(s);
             }
 
-
             return subFamilies;
+        }
+
+        public static Dictionary<string, List<string>> TwoPlusCharWord(List<string> family, char c)
+        {
+            int wordLength = family.First().Length;
+            string key;
+            Dictionary<string, List<string>> subFamilies = new Dictionary<string, List<string>>();
+            foreach(string s in family)
+            {
+                key = BreakIntoLocations(s, c);
+                if (!subFamilies.ContainsKey(key))
+                {
+                    subFamilies.Add(key, new List<string>());
+                }
+                subFamilies[key].Add(s);
+            }
+            return subFamilies;
+        }
+
+        public static string BreakIntoLocations(string s, char guess)
+        {
+            string locations = "";
+            foreach(char c in s)
+            {
+                locations += c == guess ? 1 : 0;
+            }
+
+            return locations;
         }
     }
 }
