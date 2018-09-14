@@ -9,7 +9,7 @@ namespace CheatingHangman.src
     class Program
     {
         const string WORD_FILE_LOCATION = @"C:\Users\Timothy Wilson\Documents\GameDevelopment\1_CheatingHangman\CheatingHangman\CheatingHangman\assets\dictionary.txt";
-        const int ALLOWED_GUESSES       = 26;
+        const int ALLOWED_GUESSES       = 10;
 
         static void Main(string[] args)
         {
@@ -95,7 +95,7 @@ namespace CheatingHangman.src
                     families            = wordBank.CreateWordFamilies(guess);
                     familySelection     = WordBank.PickAFamily(families);
 
-                    Console.WriteLine("Family Select:" + familySelection);
+                    //Console.WriteLine("Family Select:" + familySelection);
                     //If the character is not in the family
                     if (familySelection == 0)
                     {
@@ -134,7 +134,10 @@ namespace CheatingHangman.src
             } while (!completedGame);
 
             if (incorrectGuesses == ALLOWED_GUESSES)
+            {
                 DisplayLosingMessage();
+                DisplayWord(wordBank);
+            }
             else
                 DisplayWinningMessage();
 
@@ -220,12 +223,21 @@ namespace CheatingHangman.src
         }
 
         /**
+         * Function DisplayWord
+         * Goal:    to display the word (at the end)
+         */ 
+        public static void DisplayWord(WordBank wordBank)
+        {
+            Console.Write("The word was:" + wordBank.Words.First());
+        }
+
+        /**
          * Function ExitProtocol
          * Goal:    to sleep for 1 second
          */ 
         public static void ExitProtocol()
         {
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(10000);
         }
 
         /**
