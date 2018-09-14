@@ -49,7 +49,7 @@ namespace CheatingHangman.src
                 //  is at least one word that's exactly that long. That is, the game cannot be played with an integer 
                 //  word length of -42 or 137, since no English words precisely that long.
 
-                Console.WriteLine("Please input a word length from {0} to {1}",shortestWordLength,longestWordLength);
+                Console.WriteLine("Please input the word size in between from {0} to {1}",shortestWordLength,longestWordLength);
                 int.TryParse(Console.ReadLine(), out int input);
                 wordLength      = input;
                 readyForGame    = 
