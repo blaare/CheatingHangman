@@ -8,7 +8,7 @@ namespace CheatingHangman.src
 {
     class Program
     {
-        const string WORD_FILE_LOCATION = @"..\..\assets\dictionary.txt";
+        const string WORD_FILE_LOCATION = @"assets\dictionary.txt";
         const int ALLOWED_GUESSES       = 10;
 
         static void Main(string[] args)
@@ -16,8 +16,16 @@ namespace CheatingHangman.src
             bool readyForGame       = false,
                  displayCounter     = false,
                  completedGame      = false;
-            
-            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), WORD_FILE_LOCATION);
+
+            string dirname = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).Name;
+            string path;
+            if (dirname == "Debug" || dirname == "Release")
+            {
+                path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"..\..\"+WORD_FILE_LOCATION);
+            } else
+            {
+                path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), WORD_FILE_LOCATION);
+            }
 
             WordBank wordBank       = new WordBank(path);
 
