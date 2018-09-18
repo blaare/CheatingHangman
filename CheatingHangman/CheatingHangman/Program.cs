@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CheatingHangman.src
 {
@@ -21,7 +19,6 @@ namespace CheatingHangman.src
             
             string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), WORD_FILE_LOCATION);
 
-            Console.Read();
             WordBank wordBank       = new WordBank(path);
 
             int longestWordLength   = wordBank.FindLongestWord().Length,
