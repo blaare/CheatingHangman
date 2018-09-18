@@ -19,8 +19,8 @@ namespace CheatingHangman.src
 
             string dirname = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).Name;
             string path;
-            if (dirname == "Debug" || dirname == "Release")
-            {
+            if (dirname == "Debug" || dirname == "Release") { 
+            
                 path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"..\..\"+WORD_FILE_LOCATION);
             } else
             {
@@ -110,6 +110,7 @@ namespace CheatingHangman.src
                     if (familySelection == 0)
                     {
                         wordBank.Words = families[familySelection];
+                        incorrectGuesses++;
                     }
                     //If the character is in the family
                     else if (familySelection == 1)
@@ -137,7 +138,7 @@ namespace CheatingHangman.src
 
                     }
 
-                    completedGame = (wordLength == correctGuesses) || (++incorrectGuesses == ALLOWED_GUESSES);
+                    completedGame = (wordLength == correctGuesses) || (incorrectGuesses == ALLOWED_GUESSES);
                 }
                 
 
@@ -146,10 +147,11 @@ namespace CheatingHangman.src
             if (incorrectGuesses == ALLOWED_GUESSES)
             {
                 DisplayLosingMessage();
-                DisplayWord(wordBank);
             }
             else
                 DisplayWinningMessage();
+
+            DisplayWord(wordBank);
 
             ExitProtocol();
 
