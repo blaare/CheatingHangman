@@ -1,6 +1,8 @@
 ﻿ using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,7 +10,7 @@ namespace CheatingHangman.src
 {
     class Program
     {
-        const string WORD_FILE_LOCATION = @"C:\Users\Timothy Wilson\Documents\GameDevelopment\1_CheatingHangman\CheatingHangman\CheatingHangman\assets\dictionary.txt";
+        const string WORD_FILE_LOCATION = @"..\..\assets\dictionary.txt";
         const int ALLOWED_GUESSES       = 10;
 
         static void Main(string[] args)
@@ -16,8 +18,11 @@ namespace CheatingHangman.src
             bool readyForGame       = false,
                  displayCounter     = false,
                  completedGame      = false;
+            
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), WORD_FILE_LOCATION);
 
-            WordBank wordBank       = new WordBank(WORD_FILE_LOCATION);
+            Console.Read();
+            WordBank wordBank       = new WordBank(path);
 
             int longestWordLength   = wordBank.FindLongestWord().Length,
                 shortestWordLength  = wordBank.FindShortestWord().Length,
