@@ -172,7 +172,7 @@ namespace CheatingHangman.src
                 result = Console.ReadLine();
                 playAgain = result.ToLower() == "y";
             } while (playAgain);
-            Console.WriteLine("Press any key to quit");
+            Console.WriteLine("Press [return] to quit");
             Console.Read();
 
 
