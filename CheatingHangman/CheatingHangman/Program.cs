@@ -8,152 +8,172 @@ namespace CheatingHangman.src
 {
     class Program
     {
-        const string WORD_FILE_LOCATION = @"assets\dictionary.txt";
-        const int ALLOWED_GUESSES       = 10;
+        const string WORD_FILE_LOCATION = "dictionary.txt";
 
         static void Main(string[] args)
         {
-            bool readyForGame       = false,
-                 displayCounter     = false,
-                 completedGame      = false;
-
-            string dirname = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).Name;
-            string path;
-            if (dirname == "Debug" || dirname == "Release") { 
-            
-                path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"..\..\"+WORD_FILE_LOCATION);
-            } else
-            {
-                path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), WORD_FILE_LOCATION);
-            }
-
-            WordBank wordBank       = new WordBank(path);
-
-            int longestWordLength   = wordBank.FindLongestWord().Length,
-                shortestWordLength  = wordBank.FindShortestWord().Length,
-                incorrectGuesses    = 0,
-                correctGuesses      = 0,
-                wordLength,
-                familySelection;
-
-            List<char> usedLetters  = new List<char>();
-            
-            Dictionary<int, List<string>> families;
-            Dictionary<string, List<string>> complexFamily;
-
-            string complexFamilySelection;
-             
-            char[] theWord;
-            char guess;
-
-            //Initialization Process
-
-            //Read the file dictionary.txt, which contains the full contents of the Official Scrabble Player's Dictionary, 
-            //  Second Edition. This word list has over 120,000 words. Research how to handle File I/O in C#.
-            Console.WriteLine("==== Welcome to Cheating Hangman ====");
+            bool playAgain = false;
             do
             {
-                //Input Process
+                bool readyForGame = false,
+                     displayCounter = false,
+                     completedGame = false;
 
-                //Prompt the user for a word length, reprompting as necessary until they enter a number such that there 
-                //  is at least one word that's exactly that long. That is, the game cannot be played with an integer 
-                //  word length of -42 or 137, since no English words precisely that long.
+                int ALLOWED_GUESSES = 10;
 
-                Console.WriteLine("Please input the word size in between from {0} to {1}",shortestWordLength,longestWordLength);
-                int.TryParse(Console.ReadLine(), out int input);
-                wordLength      = input;
-                readyForGame    = 
-                    (input >= shortestWordLength) && 
-                    (input <= longestWordLength) && 
-                    (wordBank.FindWordsOfLength(wordLength).Count() > 0);
-                if (!readyForGame)
-                    Console.WriteLine("No words found of length {0}", wordLength);
-                
-            } while (!readyForGame );
-
-            //Prompt the user for the runtime option of the option to display a running total of the number of words 
-            //  remaining in the word list. See the example program trace. (This completely ruins the illusion of a 
-            //  fair game that you'll be cultivating, but it's quite useful for testing -- and grading!)
-            Console.WriteLine("Would you like a running word(s) counter to be displayed?[Y/n]");
-            string result = Console.ReadLine();
-            displayCounter = result.ToLower() == "y";
-
-
-            //Prepare for Guessing
-
-            wordBank.Words = wordBank.FindWordsOfLength(wordLength);
-            theWord = new char[wordLength];
-
-            //Guessing Process
-
-            //Prompt the user for a number of incorrect guesses that they are allowed, which must be an integer greater 
-            //  than zero. (The user will always win for games with 26 or more incorrect guesses.)
-            do
-            {
-                DisplayNumberOfGuesses(ALLOWED_GUESSES - incorrectGuesses);
-                if (displayCounter)
-                    DisplayCounter(wordBank);
-                DisplayWordBlanks(wordLength, theWord);
-                DisplayUsedLetters(usedLetters);
-                guess = char.ToLower(GetUserGuess());
-
-                if (usedLetters.IndexOf(guess) == -1)
+                string dirname = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).Name;
+                string path;
+                if (dirname == "Debug" || dirname == "Release")
                 {
-                    usedLetters.Add(guess);
-                    usedLetters.Sort();
-
-                    families            = wordBank.CreateWordFamilies(guess);
-                    familySelection     = WordBank.PickAFamily(families);
-
-                    //Console.WriteLine("Family Select:" + familySelection);
-                    //If the character is not in the family
-                    if (familySelection == 0)
-                    {
-                        wordBank.Words = families[familySelection];
-                        incorrectGuesses++;
-                    }
-                    //If the character is in the family
-                    else if (familySelection == 1)
-                    {
-                        families = WordBank.SingleCharWord(families[familySelection], guess);
-                        familySelection = WordBank.PickAFamily(families);
-                        wordBank.Words = families[familySelection];
-                        theWord[familySelection] = guess;
-                        correctGuesses++;
-                        
-                    }
-                    else
-                    {
-                        complexFamily = WordBank.TwoPlusCharWord(families[familySelection], guess);
-                        complexFamilySelection = WordBank.PickAFamily(complexFamily);
-                        wordBank.Words = complexFamily[complexFamilySelection];
-                        for(int i = 0; i < wordLength; i++)
-                        {
-                            if(complexFamilySelection[i] == '1')
-                            {
-                                theWord[i] = guess;
-                                correctGuesses++;
-                            }
-                        }
-
-                    }
-
-                    completedGame = (wordLength == correctGuesses) || (incorrectGuesses == ALLOWED_GUESSES);
+                    path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"..\..\" + WORD_FILE_LOCATION);
+                }
+                else
+                {
+                    path = WORD_FILE_LOCATION;
                 }
                 
+                WordBank wordBank = new WordBank(path);
 
-            } while (!completedGame);
+                int longestWordLength = wordBank.FindLongestWord().Length,
+                    shortestWordLength = wordBank.FindShortestWord().Length,
+                    incorrectGuesses = 0,
+                    correctGuesses = 0,
+                    wordLength,
+                    familySelection;
 
-            if (incorrectGuesses == ALLOWED_GUESSES)
-            {
-                DisplayLosingMessage();
-            }
-            else
-                DisplayWinningMessage();
+                List<char> usedLetters = new List<char>();
 
-            DisplayWord(wordBank);
+                Dictionary<int, List<string>> families;
+                Dictionary<string, List<string>> complexFamily;
 
-            ExitProtocol();
+                string complexFamilySelection;
+
+                char[] theWord;
+                char guess;
+
+                //Initialization Process
+
+                //Read the file dictionary.txt, which contains the full contents of the Official Scrabble Player's Dictionary, 
+                //  Second Edition. This word list has over 120,000 words. Research how to handle File I/O in C#.
+                Console.WriteLine("==== Welcome to Cheating Hangman ====");
+                do
+                {
+                    //Input Process
+
+                    //Prompt the user for a word length, reprompting as necessary until they enter a number such that there 
+                    //  is at least one word that's exactly that long. That is, the game cannot be played with an integer 
+                    //  word length of -42 or 137, since no English words precisely that long.
+
+                    Console.WriteLine("Please input the word size in between from {0} to {1}", shortestWordLength, longestWordLength);
+                    int.TryParse(Console.ReadLine(), out int input);
+                    wordLength = input;
+                    readyForGame =
+                        (input >= shortestWordLength) &&
+                        (input <= longestWordLength) &&
+                        (wordBank.FindWordsOfLength(wordLength).Count() > 0);
+                    if (!readyForGame)
+                        Console.WriteLine("No words found of length {0}", wordLength);
+
+                } while (!readyForGame);
+                readyForGame = false;
+
+
+                do
+                {
+                    Console.WriteLine("Please input the number of guesses you would like");
+                    int.TryParse(Console.ReadLine(), out int input);
+                    ALLOWED_GUESSES = input;
+                    readyForGame = input > 0;
+                } while (!readyForGame);
+
+                //Prompt the user for the runtime option of the option to display a running total of the number of words 
+                //  remaining in the word list. See the example program trace. (This completely ruins the illusion of a 
+                //  fair game that you'll be cultivating, but it's quite useful for testing -- and grading!)
+                Console.WriteLine("Would you like a running word(s) counter to be displayed?[Y/n]");
+                string result = Console.ReadLine();
+                displayCounter = result.ToLower() == "y";
+
+
+                //Prepare for Guessing
+
+                wordBank.Words = wordBank.FindWordsOfLength(wordLength);
+                theWord = new char[wordLength];
+
+                //Guessing Process
+
+                //Prompt the user for a number of incorrect guesses that they are allowed, which must be an integer greater 
+                //  than zero. (The user will always win for games with 26 or more incorrect guesses.)
+                do
+                {
+                    DisplayNumberOfGuesses(ALLOWED_GUESSES - incorrectGuesses);
+                    if (displayCounter)
+                        DisplayCounter(wordBank);
+                    DisplayWordBlanks(wordLength, theWord);
+                    DisplayUsedLetters(usedLetters);
+                    guess = char.ToLower(GetUserGuess());
+
+                    if (usedLetters.IndexOf(guess) == -1)
+                    {
+                        usedLetters.Add(guess);
+                        usedLetters.Sort();
+
+                        families = wordBank.CreateWordFamilies(guess);
+                        familySelection = WordBank.PickAFamily(families);
+
+                        //Console.WriteLine("Family Select:" + familySelection);
+                        //If the character is not in the family
+                        if (familySelection == 0)
+                        {
+                            wordBank.Words = families[familySelection];
+                            incorrectGuesses++;
+                        }
+                        //If the character is in the family
+                        else if (familySelection == 1)
+                        {
+                            families = WordBank.SingleCharWord(families[familySelection], guess);
+                            familySelection = WordBank.PickAFamily(families);
+                            wordBank.Words = families[familySelection];
+                            theWord[familySelection] = guess;
+                            correctGuesses++;
+
+                        }
+                        else
+                        {
+                            complexFamily = WordBank.TwoPlusCharWord(families[familySelection], guess);
+                            complexFamilySelection = WordBank.PickAFamily(complexFamily);
+                            wordBank.Words = complexFamily[complexFamilySelection];
+                            for (int i = 0; i < wordLength; i++)
+                            {
+                                if (complexFamilySelection[i] == '1')
+                                {
+                                    theWord[i] = guess;
+                                    correctGuesses++;
+                                }
+                            }
+
+                        }
+
+                        completedGame = (wordLength == correctGuesses) || (incorrectGuesses == ALLOWED_GUESSES);
+                    }
+
+
+                } while (!completedGame);
+
+                if (incorrectGuesses == ALLOWED_GUESSES)
+                {
+                    DisplayLosingMessage();
+                }
+                else
+                    DisplayWinningMessage();
+
+                DisplayWord(wordBank);
+                Console.WriteLine();
+                Console.WriteLine("Would you like to play again? [Y/n]");
+                result = Console.ReadLine();
+                playAgain = result.ToLower() == "y";
+            } while (playAgain);
+            Console.WriteLine("Press any key to quit");
+            Console.Read();
 
 
         }
